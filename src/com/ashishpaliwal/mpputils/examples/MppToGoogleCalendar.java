@@ -1,25 +1,46 @@
 package com.ashishpaliwal.mpputils.examples;
 
-import com.ashishpaliwal.mpputils.CalendarUtils;
-import com.ashishpaliwal.mpputils.MppUtil;
-import com.google.gdata.data.calendar.CalendarEntry;
-
 import java.io.BufferedReader;
-import java.io.Console;
-import java.net.URL;
+import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
+import com.ashishpaliwal.mpputils.CalendarUtils;
+import com.ashishpaliwal.mpputils.MppUtil;
+import com.google.gdata.data.calendar.CalendarEntry;
+
 /**
- *
+ * Converts a Microsoft Project file to a Google Calendar
+ * 
+ * usage:  MppToGoogleCalendar [--skip_completed] projectfile.mpp username
  */
 public class MppToGoogleCalendar {
 
     public static void main(String[] args) throws Exception {
 
-        CalendarUtils calendarUtils = new CalendarUtils();
-        List<CalendarEntry> calendars = CalendarUtils.getAllCalendars(args[1], args[2]);
+    	
+    	boolean exclude_historical=false;
+        
+    	for(int idx=0; idx < args.length; idx++) {
+    		if(args[idx].startsWith("--skip_completed")) {
+    			exclude_historical=true;
+    		}
+    		else if(args[idx].startsWith("-")) {
+    			System.err.println("MppToGoogleCalendar [--skip_completed] projfile.mpp myuser@gmail.com ");
+    			return;
+    		}
+    	}
+        if(args.length < 2) {
+    		System.err.println("MppToGoogleCalendar [--skip_completed] projfile.mpp myuser@gmail.com ");
+			return;
+        }
+    	CalendarUtils calendarUtils = new CalendarUtils();
+        System.out.print("Enter password for " + args[args.length-1] + ":");
+        
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String password = reader.readLine();
+        List<CalendarEntry> calendars = CalendarUtils.getAllCalendars(args[args.length-1], password);
 
         int count = 1;
         System.out.println("Please select one of the Calendar");
@@ -41,13 +62,13 @@ public class MppToGoogleCalendar {
             return;
         }
 
-        MppUtil utils = new MppUtil();
+        MppUtil utils = new MppUtil(exclude_historical);
 
         // Create URL
         String calendarUrlString = calendars.get(choice - 1).getLinks().get(0).getHref();
         System.out.println(calendarUrlString);
 
-        utils.updateCalenderWithMppTask(args[0], args[1], args[2], calendarUrlString);
+        utils.updateCalenderWithMppTask(args[args.length-2], args[args.length-1], password, calendarUrlString);
     }
 
 }
