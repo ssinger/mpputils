@@ -4,8 +4,8 @@
   <property name="mpputils.output.dir" value="${basedir}/out/mpputils"/>
   <property name="compiler.debug" value="on"/>
   <property name="compiler.generate.no.warnings" value="true"/>
-  <property name="mpxj.dir" value="/cots/mpxj"/>
-  <property name="gdata.dir" value="/cots/gdata"/>
+  <property name="mpxj.dir" value="${basedir}/lib"/>
+  <property name="gdata.dir" value="${basedir}/gdata"/>
   <property name="mpputil.jar.file" value="${basedir}/mpputils-0.1.jar"/>
 
   <path id="mpputils.module.sourcepath">
@@ -33,7 +33,19 @@
       <src refid="mpputils.module.sourcepath"/>
     </javac>
 
-    <jar basedir="${mpputils.output.dir}" jarfile="${mpputil.jar.file}" />
+    <jar basedir="${mpputils.output.dir}" jarfile="${mpputil.jar.file}" >
+    	<manifest>
+    	<attribute name="Main-Class" value="com.ashishpaliwal.mpputils.examples.MppToGoogleCalendar" />
+    	</manifest>
+    	 <zipfileset  src="${mpxj.dir}/mpxj.jar"/>    	 	
+    	 <zipfileset  src="${mpxj.dir}/poi-3.7-20101029.jar"/>
+    		<zipfileset  src="${gdata.dir}/java/lib/gdata-client-1.0.jar"/>
+    		<zipfileset src="${gdata.dir}/java/lib/gdata-base-1.0.jar"/>
+    		<zipfileset  src="${gdata.dir}/java/lib/gdata-calendar-2.0.jar"/>
+    		<zipfileset  src="${gdata.dir}/java/lib/gdata-core-1.0.jar"/>
+    		<zipfileset  src="${gdata.dir}/java/deps/google-collect-1.0-rc1.jar"/>
+    	
+    </jar>
   </target>
   
   <target name="init" description="Build initialization">
@@ -50,4 +62,7 @@
   <target name="build.modules" depends="init, clean, compile.module.mpputils" description="build all modules"/>
   
   <target name="all" depends="build.modules" description="build all"/>
+  
+ 
+  
 </project>
